@@ -18,20 +18,19 @@ export async function loginUser(loginInput: string, password: string) {
 }
 
 
-export async function registerUser(data: {
-  name: string;
-  email: string;
-  password: string;
-  username?: string;
-  phone?: string;
-}) {
+export async function registerUser(data: any) {
   const res = await fetch(`${API_URL}/auth/register`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify(data),
   });
-  return res.json();
+
+  const json = await res.json();
+
+  if (!res.ok) throw new Error(json.message || "Registration failed");
+  return json;
 }
+
 
 
 export async function getProfile(token: string) {
