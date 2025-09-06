@@ -1,5 +1,7 @@
-'use client'
 
+
+
+"use client";
 import { useEffect, useState } from "react";
 import { getAllProducts } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
