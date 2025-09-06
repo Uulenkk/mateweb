@@ -1,25 +1,29 @@
 import { ReactNode } from "react";
 
-const API_URL = "http://173.212.216.102:5000/api"; 
+const API_URL = "http://173.212.216.102:5000/api";
 
-function getHeaders(token?: string) {
+// Accept string or null safely
+export function getHeaders(token?: string | null) {
   return {
     "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 }
 
-
+// Login
 export async function loginUser(loginInput: string, password: string) {
   const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
-    headers: getHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ loginInput, password }),
   });
-  return res.json();
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Login failed");
+  return data; // user info and token
 }
 
-
+// Register
 export async function registerUser(data: any) {
   const res = await fetch(`${API_URL}/auth/register`, {
     method: "POST",
@@ -28,85 +32,93 @@ export async function registerUser(data: any) {
   });
 
   const json = await res.json();
-
   if (!res.ok) throw new Error(json.message || "Registration failed");
   return json;
 }
 
-
-
-export async function getProfile(token: string) {
+// Get profile
+export async function getProfile() {
+  const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/auth/profile`, {
+    method: "GET",
     headers: getHeaders(token),
   });
+
+  if (!res.ok) throw new Error("Failed to fetch profile");
   return res.json();
 }
 
-
-
+// Categories
 export async function getCategories() {
-  const res = await fetch(`${API_URL}/categories`, {
-    headers: getHeaders(),
-  });
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/categories`, { headers: getHeaders(token) });
   return res.json();
 }
 
-
-
+// Products
 export async function getProducts() {
-  const res = await fetch(`${API_URL}/products`, {
-    headers: getHeaders(),
-  });
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/products`, { headers: getHeaders(token) });
   return res.json();
 }
 
+// Product interface
 export interface Product {
-  description: ReactNode;
-  sizes: any;
   id: number;
   name: string;
-  slug: string;
+  description: string;
   price: number;
   category: string;
-  images: string[]; // <- энд server-аас ирсэн зургуудын path
+  type: string;
+  gender: string;
+  material: string;
+  images: string[];
+  sizes?: { id: number; sizeLabel: string }[];
+  colors?: string[]; // ← add this
 }
 
 
+// Get all products with optional query
 export async function getAllProducts(query?: any) {
-  const q = query ? '?' + new URLSearchParams(query).toString() : '';
-  const res = await fetch(`${API_URL}/products${q}`);
+  const q = query ? "?" + new URLSearchParams(query).toString() : "";
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/products${q}`, { headers: getHeaders(token) });
   return res.json();
 }
 
-// lib/api.ts
+// Get product by id
 export async function getProductById(id: number) {
-  const res = await fetch(`http://173.212.216.102:5000/api/products/${id}`);
-  if (!res.ok) throw new Error('Failed to fetch product');
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/products/${id}`, { headers: getHeaders(token) });
+  if (!res.ok) throw new Error("Failed to fetch product");
   return res.json();
 }
 
-
-export async function createProduct(formData: FormData, token: string) {
+// Create product
+export async function createProduct(formData: FormData) {
+  const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/products`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` }, 
+    headers: getHeaders(token),
     body: formData,
   });
   return res.json();
 }
 
-
-export async function updateProduct(id: number, formData: FormData, token: string) {
+// Update product
+export async function updateProduct(id: number, formData: FormData) {
+  const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/products/${id}`, {
     method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
+    headers: getHeaders(token),
     body: formData,
   });
   return res.json();
 }
 
-
-export async function deleteProduct(id: number, token: string) {
+// Delete product
+export async function deleteProduct(id: number) {
+  const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/products/${id}`, {
     method: "DELETE",
     headers: getHeaders(token),
@@ -114,24 +126,25 @@ export async function deleteProduct(id: number, token: string) {
   return res.json();
 }
 
-
+// Get similar products
 export async function getSimilarProducts(category: string, excludeId: number, userId: number) {
+  const token = localStorage.getItem("token");
   const res = await fetch(
     `${API_URL}/products/similar?category=${category}&exclude=${excludeId}&userId=${userId}`,
-    { headers: getHeaders() }
+    { headers: getHeaders(token) }
   );
   return res.json();
 }
 
+// Products by gender and category
 export async function getProductsByGenderAndCategory(gender: string, category?: string) {
-  // Build query params
+  const token = localStorage.getItem("token");
   const params: Record<string, string> = { gender };
-  if (category) params.category = category; // only add category if it exists
+  if (category) params.category = category;
 
   const query = new URLSearchParams(params);
-
   const res = await fetch(`${API_URL}/products/products/byCategory?${query.toString()}`, {
-    headers: getHeaders(),
+    headers: getHeaders(token),
   });
 
   if (!res.ok) throw new Error("Failed to fetch products");

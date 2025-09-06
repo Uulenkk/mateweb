@@ -1,8 +1,11 @@
 'use client';
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import { ShoppingCart } from "lucide-react";
 import { getProductsByGenderAndCategory, Product } from "@/lib/api";
+import { addToCart } from "@/lib/cartApi"; // your backend API
 
 export default function CategoryPage() {
   const params = useParams();
@@ -54,6 +57,19 @@ export default function CategoryPage() {
       .finally(() => setLoading(false));
   }, [params.slug]);
 
+  // Add to cart without toast
+  const handleAddToCart = async (product: Product) => {
+    const defaultSize = product.sizes?.[0]?.sizeLabel || "S";
+    const defaultColor = product.colors?.[0] || "#000000";
+  
+    try {
+      await addToCart(product.id, 1, defaultSize, defaultColor);
+      console.log(`${product.name} сагсанд нэмэгдлээ`);
+    } catch (err: any) {
+      console.error("Сагсанд нэмэхэд алдаа гарлаа", err);
+    }
+  };
+
   if (loading) return <p className="p-4">Loading...</p>;
   if (error) return <p className="p-4 text-red-500">Error: {error}</p>;
   if (products.length === 0) return <p className="p-4">No products found</p>;
@@ -77,7 +93,14 @@ export default function CategoryPage() {
               )}
             </div>
             <h2 className="font-semibold text-lg mt-2">{product.name}</h2>
-            <p className="text-gray-700">${product.price}</p>
+            <p className="text-gray-700">{product.price}₮</p>
+            <button
+              onClick={() => handleAddToCart(product)}
+              className="mt-2 flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Сагсанд нэмэх
+            </button>
           </div>
         ))}
       </div>

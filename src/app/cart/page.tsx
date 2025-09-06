@@ -1,49 +1,119 @@
-'use client'
-import Image from 'next/image'
-import Link from 'next/link'
-import Price from '@/components/Price'
-import Quantity from '@/components/Quantity'
-import { useCart } from '@/lib/cart'
+'use client';
 
+import { useEffect, useState } from 'react';
+import {
+  getCartItems,
+  removeFromCart,
+  increaseCartItem,
+  decreaseCartItem,
+  addToCart,
+} from '@/lib/cartApi';
+
+type CartItem = {
+  id: number;
+  productId: number;
+  quantity: number;
+  size: string;
+  color: string;
+  name: string;
+  price: number;
+  images: string[];
+};
 
 export default function CartPage() {
-const { items, removeItem, updateQty, total } = useCart()
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Load cart items
+  const loadCart = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await getCartItems();
+      setCartItems(res);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch cart');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-if (!items.length) {
-return (
-<div className="text-center space-y-4">
-<h1 className="text-2xl font-semibold">Таны сагс хоосон байна</h1>
-<Link className="btn btn-primary" href="/">Дэлгүүр хэсэх</Link>
-</div>
-)
-}
+  useEffect(() => {
+    loadCart();
+  }, []);
 
+  const removeItem = async (productId: number, size: string, color: string) => {
+    try {
+      await removeFromCart(productId, size, color);
+      loadCart();
+    } catch (err: any) {
+      setError(err.message || 'Failed to remove item');
+    }
+  };
 
-return (
-<div className="grid lg:grid-cols-3 gap-8">
-<div className="lg:col-span-2 space-y-4">
-{items.map((it, i) => (
-<div key={i} className="card p-4 grid grid-cols-[96px,1fr,auto] gap-4 items-center">
-<div className="relative w-24 h-24 overflow-hidden rounded-xl">
-<Image src={it.product.imageUrl} alt={it.product.title} fill className="object-cover" />
-</div>
-<div>
-<div className="font-medium">{it.product.title}</div>
-<div className="text-sm text-gray-600">{it.size} · {it.color}</div>
-<Quantity value={it.quantity} onChange={(q)=>updateQty(i,q)} className="mt-2" />
-</div>
-<div className="text-right">
-<Price amount={it.product.price * it.quantity} />
-<button className="text-sm text-red-600 mt-2" onClick={()=>removeItem(i)}>Устгах</button>
-</div>
-</div>
-))}
-</div>
-<aside className="card p-4 h-fit space-y-3">
-<div className="flex justify-between"><span>Нийт</span><Price amount={total} /></div>
-<Link href="/checkout" className="btn btn-primary w-full">Төлбөр төлөх</Link>
-</aside>
-</div>
-)
+  const increaseItem = async (productId: number, size: string, color: string) => {
+    try {
+      await increaseCartItem(productId, size, color);
+      loadCart();
+    } catch (err: any) {
+      setError(err.message || 'Failed to increase quantity');
+    }
+  };
+
+  const decreaseItem = async (productId: number, size: string, color: string) => {
+    try {
+      await decreaseCartItem(productId, size, color);
+      loadCart();
+    } catch (err: any) {
+      setError(err.message || 'Failed to decrease quantity');
+    }
+  };
+
+  if (loading) return <p>Loading cart...</p>;
+  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+  if (cartItems.length === 0) return <p>No items in cart.</p>;
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">My Cart</h2>
+      {cartItems.map((item) => (
+        <div
+          key={item.id}
+          className="border p-4 mb-4 rounded flex items-center gap-4"
+        >
+          <img
+            src={`http://173.212.216.102:5000${item.images[0]}`}
+            alt={item.name}
+            className="w-20 h-20 object-cover rounded"
+          />
+          <div className="flex-1">
+            <p className="font-semibold text-lg">{item.name}</p>
+            <p>{item.price}₮ x {item.quantity}</p>
+            <p>Size: {item.size}, Color: {item.color}</p>
+            <div className="mt-2 flex gap-2">
+              <button
+                onClick={() => increaseItem(item.productId, item.size, item.color)}
+                className="px-2 py-1 bg-green-500 text-white rounded"
+              >
+                +
+              </button>
+              <button
+                onClick={() => decreaseItem(item.productId, item.size, item.color)}
+                className="px-2 py-1 bg-yellow-500 text-white rounded"
+              >
+                -
+              </button>
+              <button
+                onClick={() => removeItem(item.productId, item.size, item.color)}
+                className="px-2 py-1 bg-red-500 text-white rounded"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
