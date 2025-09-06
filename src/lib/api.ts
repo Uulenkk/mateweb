@@ -123,9 +123,12 @@ export async function getSimilarProducts(category: string, excludeId: number, us
   return res.json();
 }
 
-export async function getProductsByGender(gender: string) {
-  // URLSearchParams will automatically encode special characters
-  const query = new URLSearchParams({ gender });
+export async function getProductsByGenderAndCategory(gender: string, category?: string) {
+  // Build query params
+  const params: Record<string, string> = { gender };
+  if (category) params.category = category; // only add category if it exists
+
+  const query = new URLSearchParams(params);
 
   const res = await fetch(`${API_URL}/products/products/byCategory?${query.toString()}`, {
     headers: getHeaders(),

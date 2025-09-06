@@ -2,34 +2,51 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { getProductsByGender, Product } from "@/lib/api";
+import { getProductsByGenderAndCategory, Product } from "@/lib/api";
 
-export default function GenderPage() {
+export default function CategoryPage() {
   const params = useParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Map English slugs to Mongolian gender
   const genderMap: Record<string, string> = {
     men: "Эрэгтэй",
     women: "Эмэгтэй",
   };
 
-  useEffect(() => {
-    const slug = typeof params.slug === "string"
-      ? params.slug
-      : Array.isArray(params.slug)
-      ? params.slug[0]
-      : "";
+  const categoryMap: Record<string, string> = {
+    shirts: "Цамц",
+    pants: "Брюк",
+    dress: "Даашинз",
+    shoes: "Гутал",
+    jackets: "Жакет",
+    jeans: "Жинсэн өмд",
+    tops: "Топ"
+  };
 
-    const gender = genderMap[slug] || slug;
-    if (!gender) return;
+  const [genderDisplay, setGenderDisplay] = useState<string>("");
+  const [categoryDisplay, setCategoryDisplay] = useState<string>("");
+
+  useEffect(() => {
+    if (!params.slug) return;
+
+    const slugArray = Array.isArray(params.slug) ? params.slug : [params.slug];
+    const genderSlug = slugArray[0] || "";
+    const categorySlug = slugArray[1] || "";
+
+    const genderMongolian = genderMap[genderSlug];
+    const categoryMongolian = categorySlug ? categoryMap[categorySlug] : undefined;
+
+    if (!genderMongolian) return;
+
+    setGenderDisplay(genderMongolian);
+    setCategoryDisplay(categoryMongolian || "");
 
     setLoading(true);
     setError(null);
 
-    getProductsByGender(gender)
+    getProductsByGenderAndCategory(genderMongolian, categoryMongolian)
       .then(setProducts)
       .catch((err) => setError(err.message || "Failed to fetch products"))
       .finally(() => setLoading(false));
@@ -37,13 +54,15 @@ export default function GenderPage() {
 
   if (loading) return <p className="p-4">Loading...</p>;
   if (error) return <p className="p-4 text-red-500">Error: {error}</p>;
-  if (products.length === 0) return <p className="p-4">No products found for {params.slug}</p>;
+  if (products.length === 0) return <p className="p-4">No products found</p>;
 
   return (
     <div className="p-4">
-      <h1 className="text-3xl font-bold capitalize mb-6">{params.slug}</h1>
+      <h1 className="text-3xl font-bold capitalize mb-6">
+        {genderDisplay} {categoryDisplay && `/ ${categoryDisplay}`}
+      </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {products.map(product => (
+        {products.map((product) => (
           <div key={product.id} className="border rounded p-4 hover:shadow-lg transition">
             <div className="relative w-full h-64">
               {product.images[0] && (
