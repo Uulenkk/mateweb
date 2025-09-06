@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 const API_URL = "http://173.212.216.102:5000/api"; 
 
 function getHeaders(token?: string) {
@@ -59,6 +61,17 @@ export async function getProducts() {
   return res.json();
 }
 
+export interface Product {
+  description: ReactNode;
+  sizes: any;
+  id: number;
+  name: string;
+  slug: string;
+  price: number;
+  category: string;
+  images: string[]; // <- энд server-аас ирсэн зургуудын path
+}
+
 
 export async function getAllProducts(query?: any) {
   const q = query ? '?' + new URLSearchParams(query).toString() : '';
@@ -66,8 +79,10 @@ export async function getAllProducts(query?: any) {
   return res.json();
 }
 
+// lib/api.ts
 export async function getProductById(id: number) {
-  const res = await fetch(`${API_URL}/products/${id}`);
+  const res = await fetch(`http://173.212.216.102:5000/api/products/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch product');
   return res.json();
 }
 

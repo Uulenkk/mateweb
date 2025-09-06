@@ -1,35 +1,25 @@
 'use client'
-import Image from 'next/image'
-import Link from 'next/link'
-import Price from './Price'
-import { Product } from '@/data/products'
+import Image from 'next/image';
+import Link from 'next/link';
+import { Product } from "@/lib/api";
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
-    <Link
-      href={`/product/${product.slug}`}
-      className="group block overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-gray-800"
-    >
-      {/* Image */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-xl">
-        <Image
-          src={product.imageUrl}
-          alt={product.title}
-          fill
-          className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
-        />
+    <Link href={`/product/${product.slug}`} className="block rounded-lg shadow-md overflow-hidden">
+      <div className="relative w-full aspect-[4/5]">
+        {product.images[0] && (
+          <Image
+            src={`http://173.212.216.102:5000${product.images[0]}`} // server-ийн full path
+            alt={product.name}
+            fill
+            className="object-cover"
+          />
+        )}
       </div>
-
-      {/* Content */}
-      <div className="p-4">
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          {product.category === 'women' ? 'Эмэгтэй' : 'Эрэгтэй'}
-        </div>
-        <div className="font-semibold mt-1 text-gray-900 dark:text-gray-100">
-          {product.title}
-        </div>
-        <Price amount={product.price} className="mt-2" />
+      <div className="p-2">
+        <h3 className="font-semibold">{product.name}</h3>
+        <p>${product.price}</p>
       </div>
     </Link>
-  )
+  );
 }
