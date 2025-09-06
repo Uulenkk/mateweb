@@ -25,7 +25,7 @@ export const products = [
   },
   {
     id: 2,
-    name: "Dress",
+    name: "Dresss",
     category: "Women",
     price: 50,
     sizes: [
