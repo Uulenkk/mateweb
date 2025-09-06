@@ -18,11 +18,13 @@ export default function CategoryPage() {
   const categoryMap: Record<string, string> = {
     shirts: "Цамц",
     pants: "Брюк",
-    dress: "Даашинз",
+    dresses: "Даашинз",
     shoes: "Гутал",
     jackets: "Жакет",
     jeans: "Жинсэн өмд",
-    tops: "Топ"
+    tops: "Топ",
+    skirts: "Юбка",
+    tshirts: "Пудволк"
   };
 
   const [genderDisplay, setGenderDisplay] = useState<string>("");

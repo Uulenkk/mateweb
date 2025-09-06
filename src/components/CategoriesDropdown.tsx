@@ -12,11 +12,11 @@ const CategoriesDropdown = () => {
       slug: 'women',
       subcategories: [
         { name: 'Цамц', slug: 'shirts' },
-        { name: 'Даашинз', slug: 'dress' },
+        { name: 'Даашинз', slug: 'dresses' },
         { name: 'Гутал', slug: 'shoes' },
-        { name: 'Юпек', slug: 'skirt' },
-        { name: 'Жинсэн өмд', slug: 'jeans' },
-        { name: 'Пудволк', slug: 't-shirt' },
+        { name: 'Юбка', slug: 'skirts' },
+        { name: 'Жинсэн өмд', slug: 'jeanss' },
+        { name: 'Пудволк', slug: 'tshirts' },
         { name: 'top', slug: 'tops' },
       ],
     },
@@ -28,6 +28,7 @@ const CategoriesDropdown = () => {
         { name: 'Жакет', slug: 'jackets' },
         { name: 'Гутал', slug: 'shoes' },
         { name: 'Жинсэн өмд', slug: 'jeans' },
+        { name: 'Пудволк', slug: 'tshirts' },
       ],
     },
   ]
