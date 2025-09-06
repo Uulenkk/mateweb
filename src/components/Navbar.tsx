@@ -16,7 +16,7 @@ export default function Navbar() {
         <Link href="/" className="font-semibold text-lg">MateStore</Link>
 
         <nav className="flex items-center gap-5 text-sm">
-          <Link href="/category/women">Эмэгтэй</Link>
+          <Link href="/category/Эмэгтэй">Эмэгтэй</Link>
           <Link href="/category/men">Эрэгтэй</Link>
           <Link href="/cart" className="relative">
             Сагс

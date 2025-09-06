@@ -5,7 +5,7 @@ import Footer from '@/components/Footer'
 import { CartProvider } from '@/lib/cart'
 
 export const metadata: Metadata = {
-  title: 'ZONDO — Хувцасны дэлгүүр',
+  title: 'MateStore — Хувцасны дэлгүүр',
   description: 'Зөвхөн фронтенд демо eCommerce',
 }
 
