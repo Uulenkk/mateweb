@@ -39,6 +39,7 @@ export default function ProfilePage() {
         <p><strong>User ID:</strong> {user.userId}</p>
         <p><strong>Email:</strong> {user.email}</p>
         <p><strong>Is Admin:</strong> {user.isAdmin ? 'Yes' : 'No'}</p>
+        <p><strong>Name:</strong> {user.name}</p>
       </div>
     </div>
   )

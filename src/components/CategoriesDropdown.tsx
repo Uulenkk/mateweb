@@ -15,7 +15,7 @@ const CategoriesDropdown = () => {
         { name: 'Даашинз', slug: 'dresses' },
         { name: 'Гутал', slug: 'shoes' },
         { name: 'Юбка', slug: 'skirts' },
-        { name: 'Жинсэн өмд', slug: 'jeanss' },
+        { name: 'Жинсэн өмд', slug: 'jeans' },
         { name: 'Пудволк', slug: 'tshirts' },
         { name: 'Топ', slug: 'tops' },
       ],
